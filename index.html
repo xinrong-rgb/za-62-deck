@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>雜阿含 62 經 · 五受陰 見我 · 不見我</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FDFAF4; --bg-2:#F5EDD6; --bg-3:#EFE4C7;
+  --ink:#2E2419; --ink-2:#5B4A36; --ink-3:#8B7656; --ink-4:#B5A584;
+  --accent:#3A5A7A;
+  --accent-2:#B8843A;
+  --t1:64px; --t2:44px; --t3:26px; --t4:14px;
+  --serif:"Noto Serif TC", "Source Han Serif TC", serif;
+  --sans:"Noto Sans TC", "Source Han Sans TC", sans-serif;
+  --mono:"JetBrains Mono", monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased;}
+body{position:relative;}
+
+#progress{position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); z-index:100; transition:width .55s ease;}
+#section-tag{position:fixed; top:18px; left:28px; font-family:var(--mono); font-size:12px; letter-spacing:2px; color:var(--ink-3); z-index:100;}
+#section-tag::before{content:"— "; color:var(--accent-2);}
+#section-tag::after{content:" —"; color:var(--accent-2);}
+#navbar{
+  position:fixed; bottom:16px; right:22px; z-index:100;
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--mono);
+}
+.nav-arrow{
+  background:none; border:none; cursor:pointer;
+  color:var(--ink-3); font-size:34px; line-height:1;
+  padding:2px 10px; border-radius:6px;
+  font-family:var(--serif); font-weight:300;
+  transition:color .15s, background .15s;
+}
+.nav-arrow:hover{color:var(--accent); background:rgba(58,90,122,.08);}
+.nav-arrow:disabled{color:var(--ink-4); cursor:default; background:none;}
+.nav-count{font-size:14px; color:var(--ink-3); letter-spacing:1px; margin:0 4px;}
+#curPage{color:var(--ink); font-weight:600;}
+.nav-count .sep{color:var(--ink-4); margin:0 3px;}
+
+/* === 三件套 A：講師白板（?teacher=1 才顯示） === */
+.side-wb{display:none;}
+body.teacher-mode .side-wb{display:block;}
+.side-wb-toggle{
+  position:fixed; top:14px; right:14px; z-index:1001;
+  background:var(--accent); color:#fff; border:none;
+  padding:8px 16px; border-radius:20px; cursor:pointer;
+  font-family:var(--mono); font-size:13px; letter-spacing:1.5px;
+  box-shadow:0 2px 8px rgba(46,36,25,.18);
+  opacity:.88; transition:opacity .2s, background .2s;
+}
+.side-wb-toggle:hover{opacity:1; background:#2a4860;}
+.side-wb-panel{
+  position:fixed; top:0; right:0; width:360px; height:100vh;
+  background:#fffdf6; border-left:1px solid rgba(46,36,25,.16);
+  box-shadow:-6px 0 24px rgba(46,36,25,.12);
+  display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform .3s ease;
+  z-index:1000;
+}
+.side-wb.open .side-wb-panel{transform:translateX(0);}
+.side-wb.open .side-wb-toggle{display:none;}
+.side-wb-header{
+  padding:14px 20px; background:var(--bg-2);
+  border-bottom:1px solid rgba(46,36,25,.12);
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:var(--serif); font-size:16px; font-weight:700; color:var(--accent);
+}
+.side-wb-header .actions{display:flex; gap:6px;}
+.side-wb-header button{
+  background:transparent; border:1px solid rgba(46,36,25,.18);
+  border-radius:5px; padding:5px 11px; font-size:12px;
+  color:var(--ink-2); cursor:pointer; font-family:var(--sans);
+}
+.side-wb-header button:hover{background:var(--bg-3); color:var(--ink);}
+.side-wb-area{
+  flex:1; padding:20px 22px;
+  font-size:40px; line-height:1.7; color:var(--ink);
+  outline:none; overflow-y:auto;
+  font-family:var(--serif);
+}
+.side-wb-area:empty::before{
+  content:'寫筆記、補充內容、即興記錄…\A 自動存在這台瀏覽器';
+  color:var(--ink-4); font-style:italic; white-space:pre-line;
+}
+
+/* === 三件套 B：底部頁碼導覽列 === */
+.page-nav{
+  position:fixed; bottom:4px; left:50%; transform:translateX(-50%);
+  z-index:99;
+  display:flex; flex-wrap:wrap; justify-content:center; gap:2px;
+  background:rgba(253,250,244,.5);
+  padding:3px 8px; border-radius:14px;
+  box-shadow:0 1px 4px rgba(46,36,25,.1);
+  max-width:88vw;
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  opacity:.4; transition:opacity .2s, padding .2s;
+}
+.page-nav:hover{opacity:1; background:rgba(253,250,244,.96); padding:4px 10px;}
+.page-nav button{
+  min-width:20px; height:20px; padding:0 5px;
+  border:none; background:transparent; color:var(--ink-3);
+  font-size:11px; border-radius:10px; cursor:pointer;
+  font-family:var(--mono); font-weight:500;
+  transition:background .15s, color .15s;
+}
+.page-nav button:hover{background:rgba(58,90,122,.2); color:var(--accent);}
+.page-nav button.active{background:var(--accent); color:#fff; font-weight:700;}
+
+.slide{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:56px 72px 66px;
+  opacity:0; pointer-events:none;
+  transition:opacity .55s ease, transform .55s ease;
+  transform:translateY(16px);
+  overflow-x:hidden; overflow-y:auto;
+}
+.slide.active{opacity:1; pointer-events:auto; transform:translateY(0);}
+.slide-inner{width:100%; max-width:1500px; max-height:100%;}
+
+.kicker{font-family:var(--mono); font-size:14px; letter-spacing:3px; color:var(--accent-2); text-transform:uppercase; margin-bottom:16px;}
+h1{font-family:var(--serif); font-weight:900; font-size:var(--t1); line-height:1.15; color:var(--ink); letter-spacing:2px;}
+h2{font-family:var(--serif); font-weight:700; font-size:var(--t2); line-height:1.3; color:var(--ink); letter-spacing:1px; margin-bottom:20px;}
+h3{font-family:var(--serif); font-weight:700; font-size:32px; color:var(--ink); margin-bottom:12px;}
+p, li{font-family:var(--sans); font-size:26px; line-height:1.75; color:var(--ink-2);}
+.lead{font-size:32px; line-height:1.65; color:var(--ink-2);}
+.muted{color:var(--ink-3); font-size:22px; line-height:1.55;}
+.divider{width:60px; height:3px; background:var(--accent-2); margin:18px 0 26px;}
+.em{color:var(--accent);}
+.em2{color:var(--accent-2);}
+
+/* === 1 封面 === */
+.cover{background:var(--bg-2);}
+.cover::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 22% 32%, rgba(58,90,122,.10), transparent 55%),
+    radial-gradient(ellipse at 80% 78%, rgba(184,132,58,.15), transparent 55%);
+}
+.cover .slide-inner{position:relative; z-index:2;}
+.cover .title{font-size:88px; line-height:1.1; font-weight:900; letter-spacing:6px; color:var(--ink);}
+.cover .sub{font-size:32px; color:var(--ink-2); margin-top:24px; letter-spacing:3px;}
+.cover .meta{margin-top:48px; font-family:var(--mono); font-size:15px; color:var(--ink-3); letter-spacing:2px;}
+.cover .mark{position:absolute; right:60px; bottom:60px; font-family:var(--serif); font-weight:900; font-size:180px; color:rgba(58,90,122,.08); letter-spacing:10px; line-height:1; z-index:1; user-select:none;}
+
+/* === 2 經文全文對照框 === */
+.sutra{align-items:stretch;}
+.sutra .slide-inner{display:flex; flex-direction:column; min-height:0;}
+.sutra .su-head{text-align:center; flex:0 0 auto;}
+.sutra .su-q{font-family:var(--serif); font-weight:900; font-size:44px; line-height:1.25; color:var(--ink); letter-spacing:3px;}
+.sutra .su-q .em{color:var(--accent);}
+.sutra .su-sub{margin:10px 0 18px; color:var(--ink-3); font-size:22px; letter-spacing:2px;}
+.sutra .su-sub .hint{color:var(--accent-2);}
+.su-box{
+  flex:1 1 auto; min-height:0;
+  overflow-y:auto; overflow-x:hidden;
+  overscroll-behavior:contain;
+  background:var(--bg-2);
+  border-left:5px solid var(--accent);
+  border-radius:8px;
+  padding:30px 40px 30px 36px;
+  box-shadow:inset 0 -14px 18px -14px rgba(46,36,25,.18);
+}
+.su-box p{
+  font-family:var(--serif); font-size:30px; line-height:1.9;
+  color:var(--ink); letter-spacing:1px; text-indent:2em;
+  margin-bottom:12px;
+}
+.su-box p:last-child{margin-bottom:0;}
+.su-box p.dia{color:var(--accent); font-weight:500;}
+.su-box{scrollbar-width:thin; scrollbar-color:var(--accent) var(--bg-3);}
+.su-box::-webkit-scrollbar{width:12px;}
+.su-box::-webkit-scrollbar-track{background:var(--bg-3); border-radius:8px; margin:6px 0;}
+.su-box::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg, var(--accent), #2a4860);
+  border:3px solid var(--bg-3); border-radius:8px;
+}
+.su-box::-webkit-scrollbar-thumb:hover{background:var(--accent-2);}
+.su-foot{flex:0 0 auto; margin-top:12px; text-align:center;
+  font-family:var(--mono); font-size:13px; color:var(--ink-3); letter-spacing:2px;}
+
+/* === 3 場景 === */
+.scene-plain{text-align:center;}
+.scene-plain h2{font-size:52px; margin-bottom:14px;}
+.scene-plain .glyph{font-family:var(--serif); font-weight:900; font-size:180px; color:var(--accent); opacity:.18; line-height:1; letter-spacing:-8px; margin:10px 0 26px;}
+.scene-plain .lead{max-width:960px; margin:0 auto; font-size:30px;}
+.scene-plain .meta-row{display:flex; justify-content:center; gap:28px; margin-top:32px; flex-wrap:wrap;}
+.scene-plain .meta-card{background:var(--bg-2); border-top:3px solid var(--accent-2); border-radius:8px; padding:18px 28px; min-width:210px;}
+.scene-plain .meta-card .k{font-family:var(--mono); font-size:12px; color:var(--accent-2); letter-spacing:2px; margin-bottom:6px;}
+.scene-plain .meta-card .v{font-family:var(--serif); font-weight:700; font-size:22px; color:var(--ink);}
+
+/* === 4 大問句 === */
+.bigq{text-align:center;}
+.bigq .q{font-family:var(--serif); font-weight:900; font-size:64px; line-height:1.35; color:var(--ink); letter-spacing:4px;}
+.bigq .q .em{color:var(--accent);}
+.bigq .q .em2{color:var(--accent-2);}
+.bigq .meta{margin-top:36px; color:var(--ink-3); font-size:24px; letter-spacing:2px;}
+.bigq .lead{max-width:1000px; margin:32px auto 0; font-size:28px;}
+
+/* === 5 兩種人對比 === */
+.two-people{display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:stretch;}
+.two-people .card{background:var(--bg-2); border-radius:12px; padding:36px 32px; display:flex; flex-direction:column;}
+.two-people .card.dark{background:rgba(46,36,25,.92); color:var(--bg);}
+.two-people .card.light{background:var(--bg-2); border-top:5px solid var(--accent);}
+.two-people .card .cap{font-family:var(--mono); font-size:14px; letter-spacing:3px; margin-bottom:12px;}
+.two-people .card.dark .cap{color:var(--accent-2);}
+.two-people .card.light .cap{color:var(--accent);}
+.two-people .card h3{font-family:var(--serif); font-weight:900; font-size:44px; margin-bottom:16px; line-height:1.15; letter-spacing:3px;}
+.two-people .card.dark h3{color:var(--bg);}
+.two-people .card.light h3{color:var(--ink);}
+.two-people .card .body{font-size:24px; line-height:1.7; margin-bottom:14px;}
+.two-people .card.dark .body{color:var(--bg-3);}
+.two-people .card.light .body{color:var(--ink-2);}
+.two-people .card .body strong{font-weight:700;}
+.two-people .card.dark .body strong{color:var(--accent-2);}
+.two-people .card.light .body strong{color:var(--accent);}
+.two-people .card .traits{display:flex; flex-wrap:wrap; gap:8px; margin-top:auto;}
+.two-people .card .traits .t{padding:6px 14px; border-radius:16px; font-family:var(--serif); font-size:20px; letter-spacing:1px;}
+.two-people .card.dark .traits .t{background:rgba(184,132,58,.25); color:var(--bg);}
+.two-people .card.light .traits .t{background:var(--bg-3); color:var(--ink);}
+
+/* === 6 三種型態：是我 / 異我 / 相在 === */
+.three-modes h2{text-align:center; margin-bottom:12px; font-size:52px;}
+.three-modes .sub{text-align:center; color:var(--ink-3); font-size:24px; margin-bottom:36px; letter-spacing:1px;}
+.mode-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:26px;}
+.mode-card{background:var(--bg-2); border-top:4px solid var(--accent-2); border-radius:10px; padding:30px 26px;}
+.mode-card .n{font-family:var(--mono); font-size:13px; color:var(--accent-2); letter-spacing:2px;}
+.mode-card h4{font-family:var(--serif); font-weight:900; font-size:40px; color:var(--ink); margin:6px 0 12px; letter-spacing:2px;}
+.mode-card .who{font-family:var(--mono); font-size:14px; color:var(--accent); letter-spacing:2px; margin-bottom:10px;}
+.mode-card .desc{font-size:22px; color:var(--ink-2); line-height:1.6;}
+.mode-card .desc .k{color:var(--accent); font-weight:600;}
+.mode-card .ex{margin-top:14px; padding-top:12px; border-top:1px dashed var(--ink-4); font-family:var(--serif); font-size:20px; color:var(--ink-3); line-height:1.55;}
+.mode-card .ex::before{content:"例　▸　"; color:var(--accent-2); font-family:var(--mono); font-size:14px; letter-spacing:2px;}
+
+/* === 7 五陰 × 三型態 = 十五種見我 === */
+.matrix h2{text-align:center; margin-bottom:12px; font-size:50px;}
+.matrix .sub{text-align:center; color:var(--ink-3); font-size:22px; margin-bottom:26px; letter-spacing:1px;}
+.matrix-table-wrap{overflow-x:auto;}
+.matrix-table{width:100%; border-collapse:collapse; font-size:20px;}
+.matrix-table th{padding:14px 16px; font-family:var(--serif); font-weight:700; color:var(--ink); background:var(--bg-2); border-bottom:2px solid var(--ink);}
+.matrix-table th:first-child{background:transparent; border-bottom:2px solid var(--ink-4); font-family:var(--mono); color:var(--ink-3); font-size:14px; letter-spacing:2px; width:16%;}
+.matrix-table td{padding:12px 16px; font-size:22px; color:var(--ink); border-bottom:1px solid var(--bg-3); vertical-align:top; line-height:1.55;}
+.matrix-table td:first-child{font-family:var(--serif); font-weight:700; color:var(--accent); font-size:26px; background:var(--bg-3);}
+.matrix-foot{margin-top:18px; text-align:center; font-family:var(--mono); font-size:14px; color:var(--ink-3); letter-spacing:2px;}
+
+/* === 8 苦的鎖鏈 === */
+.chain-block{display:grid; grid-template-columns:1fr 1.15fr; gap:52px; align-items:center;}
+.chain-block .left h2{font-size:48px; margin-bottom:16px;}
+.chain-block .left .lead{font-size:26px;}
+.chain-block .right{background:var(--bg-2); border-left:5px solid var(--accent); padding:34px 40px; border-radius:8px;}
+.chain-block .right .quote{font-family:var(--serif); font-size:30px; line-height:1.85; color:var(--ink); letter-spacing:1px;}
+.chain-block .right .src{margin-top:20px; font-family:var(--mono); font-size:13px; color:var(--ink-3); letter-spacing:2px;}
+.chain-block .chain{margin-top:26px;}
+.chain-block .chain .row{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+.chain-block .chain .node{background:rgba(46,36,25,.92); color:var(--bg); padding:12px 22px; border-radius:22px; font-family:var(--serif); font-size:24px;}
+.chain-block .chain .node.hot{background:var(--accent); color:var(--bg);}
+.chain-block .chain .arr{color:var(--accent-2); font-size:28px; font-family:var(--serif);}
+
+/* === 9 聖弟子的翻轉 === */
+.flip{display:grid; grid-template-columns:1fr auto 1fr; gap:32px; align-items:center;}
+.flip .side{background:var(--bg-2); border-radius:12px; padding:32px;}
+.flip .side.dark{background:rgba(46,36,25,.92); color:var(--bg);}
+.flip .side .cap{font-family:var(--mono); font-size:14px; letter-spacing:2.5px; margin-bottom:10px;}
+.flip .side.dark .cap{color:var(--accent-2);}
+.flip .side.light .cap{color:var(--accent);}
+.flip .side h4{font-family:var(--serif); font-size:38px; font-weight:900; letter-spacing:2px; margin-bottom:14px;}
+.flip .side .list{font-size:24px; line-height:1.85;}
+.flip .side.dark .list{color:var(--bg-3);}
+.flip .side.light .list{color:var(--ink-2);}
+.flip .arr{font-family:var(--serif); font-size:60px; color:var(--accent-2); font-weight:900;}
+.flip-head{text-align:center; margin-bottom:30px;}
+.flip-head h2{font-size:50px; margin-bottom:10px;}
+.flip-head .sub{color:var(--ink-3); font-size:22px; letter-spacing:1px;}
+
+/* === 10 一切正觀，皆悉無常 === */
+.observe{text-align:center;}
+.observe .kicker{margin-bottom:14px;}
+.observe h2{font-size:54px; margin-bottom:20px; letter-spacing:2px;}
+.observe .lead{font-size:28px; max-width:1000px; margin:0 auto 30px;}
+.observe .quote-box{background:var(--bg-2); padding:36px 40px; border-radius:12px; border-top:5px solid var(--accent); max-width:1100px; margin:0 auto;}
+.observe .quote-box .q{font-family:var(--serif); font-weight:900; font-size:44px; letter-spacing:3px; color:var(--ink); line-height:1.45;}
+.observe .quote-box .q .em{color:var(--accent);}
+.observe .quote-box .q .em2{color:var(--accent-2);}
+
+/* === 11 三世·十一種面向 === */
+.dim h2{text-align:center; margin-bottom:12px; font-size:50px;}
+.dim .sub{text-align:center; color:var(--ink-3); font-size:22px; margin-bottom:30px; letter-spacing:1px;}
+.dim-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:26px; margin-bottom:24px;}
+.dim-card{background:var(--bg-2); border-left:5px solid var(--accent-2); border-radius:10px; padding:24px 26px;}
+.dim-card .cap{font-family:var(--mono); font-size:13px; color:var(--accent-2); letter-spacing:2px;}
+.dim-card h4{font-family:var(--serif); font-weight:900; font-size:30px; color:var(--ink); margin:6px 0 12px; letter-spacing:2px;}
+.dim-card .pairs{display:flex; flex-wrap:wrap; gap:8px;}
+.dim-card .pairs .p{background:var(--bg-3); padding:8px 16px; border-radius:6px; font-family:var(--serif); font-size:22px; color:var(--ink); letter-spacing:1px;}
+.dim-note{text-align:center; background:rgba(46,36,25,.92); color:var(--bg); padding:22px 30px; border-radius:10px; font-family:var(--serif); font-size:28px; letter-spacing:2px; margin-top:10px;}
+.dim-note .em{color:var(--accent-2);}
+
+/* === 12 CTA === */
+.cta{align-items:flex-start;}
+.cta::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(58,90,122,.14), transparent 60%),
+    radial-gradient(circle at 88% 82%, rgba(184,132,58,.18), transparent 55%);
+}
+.cta .slide-inner{position:relative; z-index:2; padding-top:60px;}
+.cta .kicker{margin-bottom:12px;}
+.cta h1{font-size:72px; letter-spacing:6px; line-height:1.15;}
+.cta .lead{margin-top:20px; font-size:32px; line-height:1.55; max-width:940px;}
+.cta .cta-card{margin-top:34px; background:rgba(46,36,25,.92); color:var(--bg); padding:28px 36px; border-radius:10px; max-width:900px;}
+.cta .cta-card .label{font-family:var(--mono); font-size:13px; letter-spacing:3px; color:var(--accent-2);}
+.cta .cta-card .action{font-family:var(--serif); font-size:32px; line-height:1.5; margin-top:10px; color:var(--bg);}
+.cta .cta-card .small{font-size:18px; color:var(--ink-4); margin-top:14px;}
+
+@media (max-width:1100px){
+  .slide{padding:56px 40px 66px;}
+  h1{font-size:44px;}
+  .cover .title{font-size:56px;}
+  .bigq .q{font-size:38px;}
+  .two-people, .chain-block, .flip{grid-template-columns:1fr !important; gap:20px;}
+  .flip .arr{transform:rotate(90deg);}
+  .mode-grid{grid-template-columns:1fr;}
+  .dim-grid{grid-template-columns:1fr;}
+}
+
+@media (max-width:720px){
+  .slide{padding:48px 16px 56px; overflow-y:auto;}
+  .slide-inner{max-width:100%;}
+
+  #section-tag{top:12px; left:14px; font-size:10px; letter-spacing:1.5px;}
+  #progress{height:2px;}
+  #navbar{bottom:8px; right:12px;}
+  .nav-arrow{font-size:26px; padding:2px 8px;}
+  .nav-count{font-size:12px;}
+
+  h1{font-size:34px !important; letter-spacing:1.5px;}
+  h2{font-size:26px !important;}
+  h3{font-size:22px;}
+  p, li, .lead{font-size:17px; line-height:1.6;}
+  .muted{font-size:14px;}
+  .kicker{font-size:11px; letter-spacing:1.5px;}
+
+  .cover .title{font-size:34px; letter-spacing:3px;}
+  .cover .sub{font-size:16px; margin-top:12px; letter-spacing:2px;}
+  .cover .meta{font-size:11px; margin-top:20px;}
+  .cover .mark{font-size:80px; right:20px; bottom:20px;}
+
+  .sutra .su-q{font-size:22px; letter-spacing:2px;}
+  .sutra .su-sub{font-size:13px;}
+  .su-box{padding:16px 18px;}
+  .su-box p{font-size:16px; line-height:1.85;}
+
+  .scene-plain h2{font-size:26px !important;}
+  .scene-plain .glyph{font-size:100px;}
+  .scene-plain .lead{font-size:16px;}
+  .scene-plain .meta-card{padding:12px 16px; min-width:120px;}
+  .scene-plain .meta-card .v{font-size:16px;}
+
+  .bigq .q{font-size:24px; letter-spacing:2px;}
+  .bigq .lead{font-size:16px; margin-top:18px;}
+  .bigq .meta{font-size:13px;}
+
+  .two-people .card{padding:22px 20px;}
+  .two-people .card h3{font-size:24px; letter-spacing:2px;}
+  .two-people .card .body{font-size:15px;}
+  .two-people .card .traits .t{font-size:13px; padding:4px 10px;}
+
+  .three-modes h2{font-size:26px !important;}
+  .three-modes .sub{font-size:13px; margin-bottom:20px;}
+  .mode-card{padding:18px 18px;}
+  .mode-card h4{font-size:24px; letter-spacing:2px;}
+  .mode-card .who{font-size:12px;}
+  .mode-card .desc{font-size:15px;}
+  .mode-card .ex{font-size:13px;}
+
+  .matrix h2{font-size:26px !important;}
+  .matrix .sub{font-size:13px;}
+  .matrix-table{font-size:13px; min-width:520px;}
+  .matrix-table th{font-size:14px; padding:8px 10px;}
+  .matrix-table th:first-child{font-size:11px;}
+  .matrix-table td{font-size:14px; padding:8px 10px;}
+  .matrix-table td:first-child{font-size:16px;}
+  .matrix-foot{font-size:11px;}
+
+  .chain-block .left h2{font-size:26px !important;}
+  .chain-block .right{padding:18px 20px;}
+  .chain-block .right .quote{font-size:16px;}
+  .chain-block .chain .node{font-size:13px; padding:6px 12px;}
+  .chain-block .chain .arr{font-size:18px;}
+
+  .flip-head h2{font-size:26px !important;}
+  .flip-head .sub{font-size:13px;}
+  .flip .side{padding:18px;}
+  .flip .side h4{font-size:22px;}
+  .flip .side .list{font-size:14px; line-height:1.7;}
+  .flip .arr{font-size:32px;}
+
+  .observe h2{font-size:26px !important;}
+  .observe .lead{font-size:16px;}
+  .observe .quote-box{padding:20px 22px;}
+  .observe .quote-box .q{font-size:22px; letter-spacing:2px;}
+
+  .dim h2{font-size:26px !important;}
+  .dim .sub{font-size:13px;}
+  .dim-card{padding:16px 18px;}
+  .dim-card h4{font-size:20px; letter-spacing:2px;}
+  .dim-card .pairs .p{font-size:14px; padding:5px 10px;}
+  .dim-note{font-size:16px; padding:14px 18px; letter-spacing:1px;}
+
+  .cta .slide-inner{padding-top:20px;}
+  .cta h1{font-size:36px !important; letter-spacing:2px;}
+  .cta .lead{font-size:17px; margin-top:12px;}
+  .cta .cta-card{padding:16px 18px; margin-top:18px;}
+  .cta .cta-card .label{font-size:11px;}
+  .cta .cta-card .action{font-size:18px;}
+  .cta .cta-card .small{font-size:13px;}
+
+  .side-wb-panel{width:90vw; max-width:360px;}
+  .side-wb-area{font-size:22px; line-height:1.6;}
+  .side-wb-toggle{top:10px; right:10px; padding:6px 12px; font-size:12px;}
+
+  .page-nav{gap:0; padding:2px 5px; max-width:96vw;}
+  .page-nav button{min-width:16px; height:16px; font-size:9px; padding:0 2px;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="section-tag">引起動機</div>
+<div id="navbar">
+  <button class="nav-arrow" id="prevBtn" aria-label="上一頁">‹</button>
+  <span class="nav-count"><span id="curPage">1</span><span class="sep">/</span><span id="totalPage">12</span></span>
+  <button class="nav-arrow" id="nextBtn" aria-label="下一頁">›</button>
+</div>
+
+<!-- 三件套 A：講師白板（?teacher=1 才顯示） -->
+<div id="side-wb" class="side-wb">
+  <button class="side-wb-toggle" onclick="document.getElementById('side-wb').classList.add('open')" title="開啟白板">✎ 白板</button>
+  <div class="side-wb-panel">
+    <div class="side-wb-header">
+      <span>講師白板</span>
+      <div class="actions">
+        <button onclick="if(confirm('清空白板內容？')){document.getElementById('wb-area').innerHTML='';localStorage.removeItem('s62-wb');}">清空</button>
+        <button onclick="document.getElementById('side-wb').classList.remove('open')">收合 ›</button>
+      </div>
+    </div>
+    <div id="wb-area" class="side-wb-area" contenteditable="true" spellcheck="false"></div>
+  </div>
+</div>
+
+<!-- ===== 1. COVER ===== -->
+<section class="slide active cover" data-slide="1" data-section="引起動機">
+  <div class="slide-inner">
+    <div class="kicker">雜阿含 · 六十二</div>
+    <div class="title">五受陰　<span style="color:var(--accent-2)">見我</span><br>與　<span style="color:var(--accent)">不見我</span></div>
+    <div class="sub">愚癡凡夫　繫著、心結縛而生貪欲<br>多聞聖弟子　一切正觀，皆悉無常</div>
+    <div class="meta">SAṂYUKTA ĀGAMA 62　·　佛住舍衛國祇樹給孤獨園</div>
+  </div>
+  <div class="mark">我</div>
+</section>
+
+<!-- ===== 2. 經文全文 ===== -->
+<section class="slide sutra" data-slide="2" data-section="引起動機">
+  <div class="slide-inner">
+    <div class="su-head">
+      <div class="kicker">起點 · 全文　｜　雜阿含 62 經 全文</div>
+      <div class="su-q">凡夫與聖弟子的分水嶺——<span class="em">在五受陰上，看見「我」了嗎</span>？</div>
+      <div class="su-sub">佛陀對諸比丘的一段開示　<span class="hint">▸ 框內可上下捲動讀全文</span></div>
+    </div>
+    <div class="su-box" id="suBox" tabindex="0">
+      <p>如是我聞：一時，佛住舍衛國祇樹給孤獨園。</p>
+      <p>爾時，世尊告諸比丘：</p>
+      <p class="dia">「有五受陰：謂色受陰，受、想、行、識受陰。</p>
+      <p>愚癡無聞凡夫，無慧、無明，於五受陰生我見、繫著、使、心結縛而生貪欲。</p>
+      <p>比丘！多聞聖弟子，有慧、有明，於此五受陰，不為見我、繫著、使、心結縛而起貪欲。</p>
+      <p>云何愚癡無聞凡夫，無慧、無明，於五受陰見我、繫著、使、心結縛而生貪欲？比丘！愚癡無聞凡夫，無慧、無明，見色是我、異我、相在。</p>
+      <p>如是，受、想、行、識，是我、異我、相在。</p>
+      <p>如是，愚癡無聞凡夫，無慧、無明，於五受陰說我、繫著、使、心結縛而生貪欲。</p>
+      <p>比丘！云何聖弟子，有慧、有明，不說我、繫著、使、結縛心而生貪欲？聖弟子不見色是我、異我、相在。</p>
+      <p>如是，受、想、行、識，不見是我、異我、相在。</p>
+      <p>如是，多聞聖弟子，有慧、有明，於五受陰不見我、繫著、使、結縛心而生貪欲。</p>
+      <p>若所有色，若過去、若未來、若現在，若內、若外，若麤、若細，若好、若醜，若遠、若近，彼一切正觀，皆悉無常。</p>
+      <p>如是，受、想、行、識，若過去、若未來、若現在，若內、若外，若麤、若細，若好、若醜，若遠、若近，彼一切正觀，皆悉無常。」</p>
+      <p>佛說此經已，諸比丘聞佛所說，歡喜奉行。</p>
+    </div>
+    <div class="su-foot">雜阿含 62 經 · 求那跋陀羅譯 —— 全文照錄，供對照用</div>
+  </div>
+</section>
+
+<!-- ===== 3. 場景 ===== -->
+<section class="slide" data-slide="3" data-section="引起動機">
+  <div class="slide-inner scene-plain">
+    <div class="kicker">場景 · 舍衛國</div>
+    <h2>祇樹給孤獨園　佛陀親自開示</h2>
+    <div class="glyph">陰</div>
+    <p class="lead">這一次沒有問答，是佛陀主動向比丘們挑明——<br>凡夫與聖弟子的差別，不在功德多寡，也不在禪定深淺，<br>就在「面對五受陰時，還看不看到有一個我」。</p>
+    <div class="meta-row">
+      <div class="meta-card"><div class="k">地　點</div><div class="v">舍衛國 · 祇樹給孤獨園</div></div>
+      <div class="meta-card"><div class="k">說法主</div><div class="v">世　尊</div></div>
+      <div class="meta-card"><div class="k">聽　眾</div><div class="v">諸比丘</div></div>
+      <div class="meta-card"><div class="k">主　題</div><div class="v">五受陰　·　我見</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4. 大問句 ===== -->
+<section class="slide bigq" data-slide="4" data-section="核心命題">
+  <div class="slide-inner">
+    <div class="kicker">核心命題</div>
+    <div class="q">同樣是「色受想行識」——<br>為什麼有人被<span class="em2">繫縛</span>，<br>有人卻能<span class="em">解脫</span>？</div>
+    <p class="lead">佛陀說：關鍵不在陰的多少、也不在境的好壞，<br>而在——「有沒有見『這是我』」。</p>
+    <div class="meta">「見我」是繫縛的根，「不見我」是解脫的入處</div>
+  </div>
+</section>
+
+<!-- ===== 5. 兩種人的對比 ===== -->
+<section class="slide" data-slide="5" data-section="兩種人的分野">
+  <div class="slide-inner">
+    <h2 style="text-align:center; margin-bottom:36px;">愚癡凡夫　·　多聞聖弟子　——　兩種人</h2>
+    <div class="two-people">
+      <div class="card dark">
+        <div class="cap">TYPE · A</div>
+        <h3>愚癡無聞凡夫</h3>
+        <div class="body">
+          <strong>無慧、無明</strong>——<br>
+          於五受陰，生「我見」、繫著、使、心結縛，而生<strong>貪欲</strong>。
+        </div>
+        <div class="traits">
+          <span class="t">無　慧</span>
+          <span class="t">無　明</span>
+          <span class="t">生我見</span>
+          <span class="t">繫　著</span>
+          <span class="t">結　縛</span>
+          <span class="t">貪　欲</span>
+        </div>
+      </div>
+      <div class="card light">
+        <div class="cap">TYPE · B</div>
+        <h3>多聞聖弟子</h3>
+        <div class="body">
+          <strong>有慧、有明</strong>——<br>
+          於此五受陰，<strong>不為</strong>見我、繫著、使、心結縛而起貪欲。
+        </div>
+        <div class="traits">
+          <span class="t">有　慧</span>
+          <span class="t">有　明</span>
+          <span class="t">不見我</span>
+          <span class="t">不繫著</span>
+          <span class="t">不結縛</span>
+          <span class="t">不起欲</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6. 見我的三種型態 ===== -->
+<section class="slide" data-slide="6" data-section="見我的三種型態">
+  <div class="slide-inner three-modes">
+    <div class="kicker" style="text-align:center;">見我的三種型態</div>
+    <h2>是我　·　異我　·　相在</h2>
+    <div class="sub">同樣一組五受陰，可以被「見我」出三種花樣</div>
+    <div class="mode-grid">
+      <div class="mode-card">
+        <div class="n">MODE · 1</div>
+        <h4>是　我</h4>
+        <div class="who">五陰即是我</div>
+        <div class="desc">把<span class="k">陰本身</span>當成我。<br>「這個身體就是我」、「這個感受就是我」。</div>
+        <div class="ex">「我痛」——把痛當作我，痛時整個我都苦了。</div>
+      </div>
+      <div class="mode-card">
+        <div class="n">MODE · 2</div>
+        <h4>異　我</h4>
+        <div class="who">我在陰外，陰是我所</div>
+        <div class="desc">認為<span class="k">有個「我」在陰之外</span>，五陰只是「我的」。<br>「這是我的身體」、「這是我的想法」。</div>
+        <div class="ex">「我的車被撞了」——那個「我」躲在陰後面繼續存在。</div>
+      </div>
+      <div class="mode-card">
+        <div class="n">MODE · 3</div>
+        <h4>相　在</h4>
+        <div class="who">我陰互攝</div>
+        <div class="desc">認為<span class="k">我在陰中，或陰在我中</span>。<br>兩者你中有我、我中有你。</div>
+        <div class="ex">「我就在我的心裡」、「靈魂在身體裡」——最常見的一種。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. 五陰 × 三型態 = 十五種見我 ===== -->
+<section class="slide" data-slide="7" data-section="見我的三種型態">
+  <div class="slide-inner matrix">
+    <div class="kicker" style="text-align:center;">總覽</div>
+    <h2>五陰　×　三型態　＝　十五種見我</h2>
+    <div class="sub">經文「見色是我、異我、相在。如是，受、想、行、識」——把它展開全景一次看</div>
+    <div class="matrix-table-wrap">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>五　陰</th>
+            <th>是　我</th>
+            <th>異　我　（我所）</th>
+            <th>相　在</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>色</td>
+            <td>此身即是我</td>
+            <td>此身是「我的」</td>
+            <td>我在身中，身在我中</td>
+          </tr>
+          <tr>
+            <td>受</td>
+            <td>此受即是我</td>
+            <td>此受是「我的」</td>
+            <td>我在受中，受在我中</td>
+          </tr>
+          <tr>
+            <td>想</td>
+            <td>此想即是我</td>
+            <td>此想是「我的」</td>
+            <td>我在想中，想在我中</td>
+          </tr>
+          <tr>
+            <td>行</td>
+            <td>此行即是我</td>
+            <td>此行是「我的」</td>
+            <td>我在行中，行在我中</td>
+          </tr>
+          <tr>
+            <td>識</td>
+            <td>此識即是我</td>
+            <td>此識是「我的」</td>
+            <td>我在識中，識在我中</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="matrix-foot">▸ 十五種見我，聖弟子一一不見；不見則不繫、不結、不生貪欲</div>
+  </div>
+</section>
+
+<!-- ===== 8. 苦的鎖鏈 ===== -->
+<section class="slide" data-slide="8" data-section="繫縛與貪欲">
+  <div class="slide-inner chain-block">
+    <div class="left">
+      <div class="kicker">見我 → 繫縛</div>
+      <h2>從「見我」到「貪欲」的鎖鏈</h2>
+      <p class="lead">佛用四個扣得緊緊的字，把凡夫的苦怎麼生的一路指出來——<br>只要第一環「見我」沒解開，後面每一環都會扣上。</p>
+      <div class="chain">
+        <div class="row">
+          <span class="node hot">見　我</span>
+          <span class="arr">→</span>
+          <span class="node">繫　著</span>
+          <span class="arr">→</span>
+          <span class="node">使</span>
+          <span class="arr">→</span>
+          <span class="node">心結縛</span>
+          <span class="arr">→</span>
+          <span class="node hot">生　貪　欲</span>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="quote">「愚癡無聞凡夫，<br>於五受陰　<span class="em">見我</span>、繫著、使、心結縛　<br>而生<span class="em">貪欲</span>。」</div>
+      <div class="src">▸ 雜阿含 62　佛告諸比丘</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9. 聖弟子的翻轉 ===== -->
+<section class="slide" data-slide="9" data-section="聖弟子的翻轉">
+  <div class="slide-inner">
+    <div class="flip-head">
+      <div class="kicker">翻轉</div>
+      <h2>不見我　·　整條鎖鏈就斷</h2>
+      <div class="sub">同樣的五陰、同樣的境緣——「不見我」就不繫、不結、不欲</div>
+    </div>
+    <div class="flip">
+      <div class="side dark">
+        <div class="cap">凡夫　·　BEFORE</div>
+        <h4>見　我</h4>
+        <div class="list">
+          見色是我、異我、相在<br>
+          受、想、行、識　同<br>
+          → 繫著<br>
+          → 使<br>
+          → 心結縛<br>
+          → 生貪欲
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="side light">
+        <div class="cap">聖弟子　·　AFTER</div>
+        <h4>不見我</h4>
+        <div class="list">
+          不見色是我、異我、相在<br>
+          受、想、行、識　同<br>
+          → 不繫著<br>
+          → 無使<br>
+          → 心不結縛<br>
+          → 不起貪欲
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 10. 一切正觀，皆悉無常 ===== -->
+<section class="slide" data-slide="10" data-section="收攝：正觀無常">
+  <div class="slide-inner observe">
+    <div class="kicker">收攝</div>
+    <h2>一切正觀　·　皆悉無常</h2>
+    <p class="lead">說完了「見我·不見我」的分野，佛陀立刻給出一個可以現前操作的下手處——<br>把五陰放在一切時空、一切狀態下正觀，答案永遠只有一個：<b>無　常</b>。</p>
+    <div class="quote-box">
+      <div class="q">「若所有色 ——<br>過去、未來、現在，<br>內、外，麤、細，好、醜，遠、近，<br>彼一切正觀，<span class="em">皆悉無常</span>。」</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 11. 三世·十一種面向 ===== -->
+<section class="slide" data-slide="11" data-section="收攝：正觀無常">
+  <div class="slide-inner dim">
+    <div class="kicker" style="text-align:center;">全景檢查表</div>
+    <h2>把五陰放進　十一種面向　各觀一次</h2>
+    <div class="sub">佛陀給的正觀清單：不留任何角落給「我」躲藏</div>
+    <div class="dim-grid">
+      <div class="dim-card">
+        <div class="cap">DIMENSION · 時</div>
+        <h4>三　世</h4>
+        <div class="pairs">
+          <span class="p">過去</span>
+          <span class="p">未來</span>
+          <span class="p">現在</span>
+        </div>
+      </div>
+      <div class="dim-card">
+        <div class="cap">DIMENSION · 處</div>
+        <h4>內　外　麤　細</h4>
+        <div class="pairs">
+          <span class="p">內</span>
+          <span class="p">外</span>
+          <span class="p">麤</span>
+          <span class="p">細</span>
+        </div>
+      </div>
+      <div class="dim-card">
+        <div class="cap">DIMENSION · 質</div>
+        <h4>好　醜　遠　近</h4>
+        <div class="pairs">
+          <span class="p">好</span>
+          <span class="p">醜</span>
+          <span class="p">遠</span>
+          <span class="p">近</span>
+        </div>
+      </div>
+    </div>
+    <div class="dim-note">五陰　×　十一面向　——　<span class="em">彼一切正觀，皆悉無常</span></div>
+  </div>
+</section>
+
+<!-- ===== 12. CTA ===== -->
+<section class="slide cta" data-slide="12" data-section="今日行動">
+  <div class="slide-inner">
+    <div class="kicker">今日就試</div>
+    <h1>看　·　我還在不在裡面</h1>
+    <p class="lead">下一次覺察到情緒或身體不適時，先不急著處理——<br>先問一句：「這是我？異我？相在？」<br>看見即斷；不見我，鎖鏈立即鬆。</p>
+    <div class="cta-card">
+      <div class="label">CALL TO ACTION</div>
+      <div class="action">今日對一個「感受」——<br>過去、現在、麤、細、好、醜　各觀一次：無常。</div>
+      <div class="small">五陰隨挑一陰 · 十一面向輪一遍　→　「我」漸鬆脫</div>
+    </div>
+  </div>
+</section>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+const progress = document.getElementById('progress');
+const sectionTag = document.getElementById('section-tag');
+const curPageEl = document.getElementById('curPage');
+const totalPageEl = document.getElementById('totalPage');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+totalPageEl.textContent = total;
+
+function go(i){
+  if(i < 0 || i >= total) return;
+  slides[cur].classList.remove('active');
+  cur = i;
+  slides[cur].classList.add('active');
+  progress.style.width = ((cur+1)/total*100) + '%';
+  sectionTag.textContent = slides[cur].dataset.section;
+  curPageEl.textContent = cur + 1;
+  prevBtn.disabled = (cur === 0);
+  nextBtn.disabled = (cur === total - 1);
+  if(typeof updatePageNav === 'function') updatePageNav();
+}
+
+prevBtn.addEventListener('click', e => { e.stopPropagation(); go(cur - 1); });
+nextBtn.addEventListener('click', e => { e.stopPropagation(); go(cur + 1); });
+
+document.addEventListener('keydown', e => {
+  if(e.target && e.target.isContentEditable) return;
+  const inBox = e.target && e.target.id === 'suBox';
+  if(inBox && (e.key === 'PageDown' || e.key === 'PageUp' || e.key === 'Home' || e.key === 'End')) return;
+  if(e.key === 'ArrowRight' || e.key === 'PageDown') go(cur+1);
+  else if(e.key === 'ArrowLeft' || e.key === 'PageUp') go(cur-1);
+  else if(e.key === 'Home') go(0);
+  else if(e.key === 'End') go(total-1);
+  else if(e.key === 'f' || e.key === 'F'){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+progress.style.width = (1/total*100) + '%';
+prevBtn.disabled = true;
+
+/* === 三件套 A：講師模式 + 白板 === */
+if(new URLSearchParams(window.location.search).get('teacher') === '1'){
+  document.body.classList.add('teacher-mode');
+}
+const wb = document.getElementById('wb-area');
+if(wb){
+  const WB_KEY = 's62-wb';
+  const saved = localStorage.getItem(WB_KEY);
+  if(saved) wb.innerHTML = saved;
+  wb.addEventListener('input', () => localStorage.setItem(WB_KEY, wb.innerHTML));
+  ['keydown','keyup','keypress'].forEach(ev => wb.addEventListener(ev, e => e.stopPropagation()));
+}
+document.addEventListener('click', e => {
+  const sideWB = document.getElementById('side-wb');
+  if(!sideWB || !sideWB.classList.contains('open')) return;
+  if(e.target.closest('.side-wb-panel') || e.target.closest('.side-wb-toggle')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  sideWB.classList.remove('open');
+}, true);
+
+/* 底部頁碼列已依 2026-08-06 規範移除，避免與各頁底部尾註疊字 */
+</script>
+</body>
+</html>
